@@ -5,34 +5,26 @@ import { useHistory, useParams, useRouteMatch } from "react-router-dom";
 const initialMovie = {
   title: "",
   director: "",
-  metascore: "",
+  metascore: 0,
   stars: [],
 };
 const AddMovieForm = (props) => {
   const [movie, setMovie] = useState(initialMovie);
   const [star, setStar] = useState("");
+  const [formFilled, setFormFilled] = useState(true);
   const paramId = useParams();
   const history = useHistory();
-  //console.log("Number(paramId)", Number(paramId.id));
-  //console.log("props.movies", props.movies);
-
-  //   useEffect(() => {
-  //     const selectedMovie = props.movies.find((movie) => {
-  //       return movie.id === Number(paramId.id);
-  //     });
-  //     // console.log(selectedMovie);
-  //     if (selectedMovie) {
-  //       setMovie(selectedMovie);
-  //     }
-  //     //}, [paramId.id]);
-  //   }, [props.movies, paramId.id]);
 
   const changeHandler = (ev) => {
     ev.persist();
+    let value = ev.target.value;
+    if (ev.target.name === "metascore") {
+      value = parseInt(value, 10);
+    }
 
     setMovie({
       ...movie,
-      [ev.target.name]: ev.target.value,
+      [ev.target.name]: value,
     });
   };
   //console.log("movie", movie);
@@ -58,17 +50,28 @@ const AddMovieForm = (props) => {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    axios
-      .post("http://localhost:5000/api/movies", movie)
-      .then((res) => {
-        //console.log("res addMovieForm", res);
-        props.updateMovieList(res.data);
-        history.push("/");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    console.log("movie.director", movie.director);
+    if (!movie.title || !movie.director || !movie.metascore || !movie.stars) {
+      console.log("fill out all fields", movie);
+      setFormFilled(false);
+    } else {
+      //   console.log("fill out all fields");
+      //   setFormFilled(false);
+      e.preventDefault();
+
+      axios
+        .post("http://localhost:5000/api/movies", movie)
+        .then((res) => {
+          //console.log("res addMovieForm", res);
+          setFormFilled(true);
+          setMovie(initialMovie);
+          props.updateMovieList(res.data);
+          history.push("/");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
   //console.log("movie.stars", movie.stars);
 
@@ -113,6 +116,7 @@ const AddMovieForm = (props) => {
         </label>
 
         <button type="submit">Submit</button>
+        {formFilled && <p className="error">Please, fill out all fields</p>}
       </form>
     </div>
   );

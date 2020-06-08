@@ -5,7 +5,7 @@ import { useHistory, useParams, useRouteMatch } from "react-router-dom";
 const initialMovie = {
   title: "",
   director: "",
-  metascore: "",
+  metascore: 0,
   stars: [],
 };
 const UpdateMovieForm = (props) => {
@@ -30,9 +30,14 @@ const UpdateMovieForm = (props) => {
   const changeHandler = (ev) => {
     ev.persist();
 
+    let value = ev.target.value;
+    if (ev.target.name === "metascore") {
+      value = parseInt(value, 10);
+    }
+
     setMovie({
       ...movie,
-      [ev.target.name]: ev.target.value,
+      [ev.target.name]: value,
     });
   };
   console.log("movie", movie);

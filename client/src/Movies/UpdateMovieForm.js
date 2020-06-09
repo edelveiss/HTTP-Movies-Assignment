@@ -5,7 +5,7 @@ import { useHistory, useParams, useRouteMatch } from "react-router-dom";
 const initialMovie = {
   title: "",
   director: "",
-  metascore: 0,
+  metascore: "",
   stars: [],
 };
 const UpdateMovieForm = (props) => {
@@ -13,6 +13,7 @@ const UpdateMovieForm = (props) => {
   const [star, setStar] = useState("");
   const paramId = useParams();
   const history = useHistory();
+  const [err, setErr] = useState("");
   //console.log("Number(paramId)", Number(paramId.id));
   //console.log("props.movies", props.movies);
 
@@ -68,6 +69,7 @@ const UpdateMovieForm = (props) => {
       .put(`http://localhost:5000/api/movies/${movie.id}`, movie)
       .then((res) => {
         console.log("res updateMovieForm", res);
+        setErr("");
         props.updateMovieList(
           props.movies.map((m) => {
             if (Number(m.id) === Number(res.data.id)) {
@@ -79,6 +81,7 @@ const UpdateMovieForm = (props) => {
       })
       .catch((err) => {
         console.log(err);
+        setErr("All fields must be filled out");
       });
   };
   console.log("movie.stars", movie.stars);
@@ -86,6 +89,11 @@ const UpdateMovieForm = (props) => {
   return (
     <div className="update-movie">
       <h2 style={{ textAlign: "center" }}>Update Movie</h2>
+      {err ? (
+        <p className="error" style={{ textAlign: "center" }}>
+          {err}
+        </p>
+      ) : null}
       <AddStar
         starChangeHandler={starChangeHandler}
         star={star}
@@ -100,6 +108,7 @@ const UpdateMovieForm = (props) => {
             id="title"
             type="text"
             name="title"
+            placeholder="title"
             onChange={changeHandler}
             value={movie.title}
           />
@@ -109,6 +118,7 @@ const UpdateMovieForm = (props) => {
           <input
             type="text"
             name="director"
+            placeholder="director"
             onChange={changeHandler}
             value={movie.director}
           />
@@ -118,6 +128,7 @@ const UpdateMovieForm = (props) => {
           <input
             type="text"
             name="metascore"
+            placeholder="metascore"
             onChange={changeHandler}
             value={movie.metascore}
           />
